@@ -9,24 +9,25 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Move Files to Root
+      - name: Extract and Move Bot Files
         run: |
-          # যদি ফাইলটি .github এর ভেতর থাকে তবে বাইরে আনবে
+          # যদি জিপ ফাইলটি ফোল্ডারের ভেতর থাকে তবে বাইরে আনা
           if [ -f ".github/BELAL-BOTX666-MAX-main.zip" ]; then
             mv .github/BELAL-BOTX666-MAX-main.zip ./
           fi
           
-          # ফাইল আনজিপ করা
-          unzip -o BELAL-BOTX666-MAX-main.zip
+          # জিপ ফাইল আনজিপ করা
+          if [ -f "BELAL-BOTX666-MAX-main.zip" ]; then
+            unzip -o BELAL-BOTX666-MAX-main.zip
+          fi
           
-          # ফোল্ডারের ভেতরের সবকিছু মেইন ডিরেক্টরিতে (বাইরে) নিয়ে আসা
+          # শুধুমাত্র বটের দরকারি ফাইলগুলো বাইরে আনা (.github বাদে)
           if [ -d "BELAL-BOTX666-MAX-main" ]; then
-            cp -r BELAL-BOTX666-MAX-main/* ./ 2>/dev/null || true
-            cp -r BELAL-BOTX666-MAX-main/.* ./ 2>/dev/null || true
+            find BELAL-BOTX666-MAX-main -maxdepth 1 -not -name "BELAL-BOTX666-MAX-main" -not -name ".github" -exec mv -t ./ {} +
             rm -rf BELAL-BOTX666-MAX-main
           fi
           
-          # জিপ ফাইলটি ডিলিট করা (পরিষ্কার রাখার জন্য)
+          # পুরোনো জিপ ফাইল ডিলিট করা
           rm -f BELAL-BOTX666-MAX-main.zip
 
       - name: Commit Changes
@@ -34,6 +35,6 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git diff --quiet && git diff --staged --quiet || git commit -m "Moved all bot files to the root successfully"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Moved bot files to root without touching workflows"
           git push
           
