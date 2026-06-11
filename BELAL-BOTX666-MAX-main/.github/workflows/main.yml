@@ -1,0 +1,13 @@
+name: Belal-BotX666-MAX
+
+# এটি শুধুমাত্র ম্যানুয়ালি রান করার জন্য, নিজে ক্লিক না করলে কিছুই হবে না
+on:
+  workflow_dispatch:
+
+jobs:
+  display_structure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: System Status
+        run: echo "Repository decoration setup is completed successfully!"
+        

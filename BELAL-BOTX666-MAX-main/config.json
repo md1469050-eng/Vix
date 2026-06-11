@@ -1,0 +1,104 @@
+{
+  "Author": "Belal YT",
+  "version": "8.0.0",
+  "language": "en",
+  "DeveloperMode": false,
+  "autoCreateDB": true,
+  "allowInbox": false,
+  "adminOnly": false,
+  "ndhOnly": false,
+  "adminPaOnly": false,
+
+  "BOTNAME": "┄┉❈✡️⋆⃝চাঁদেড়~পাহাড়✿⃝🪬❈┉┄",
+  "PREFIX": "/",
+
+  "ADMINBOT": [
+    "61577502464880",
+    "100056725134303",
+    "100029575411956",
+    "61584261741217",
+    "61583235547978",
+    "100050176872558",
+    "61584216563899",
+    "100086228841266",
+    "61584522727189",
+    "61554155702194",
+    "100089070078160",
+    "61567839089378",
+    "61582652176450",
+    "61558664522396",
+    "61577005829417",
+    "61582333532367",
+    "100092681074890",
+    "61564160670128",
+    "61570713004477",
+    "61571478676136",
+    "61553878133864",
+    "61589460314054",
+    "61576161943776",
+    "100075594847130"
+  ],
+  "NDH": ["61577502464880", "100056725134303"],
+
+  "APPSTATEPATH": "appstate.json",
+  "DATABASE": { "sqlite": { "storage": "data.sqlite" } },
+
+  "commandDisabled": [],
+  "eventDisabled": [],
+
+  "FCAOption": {
+    "selfListen":       false,
+    "listenEvents":     true,
+    "listenTyping":     false,
+    "updatePresence":   false,
+    "forceLogin":       false,
+    "autoMarkDelivery": false,
+    "autoMarkRead":     false,
+    "autoReconnect":    true,
+    "logRecordSize":    100,
+    "online":           false,
+    "userAgent": "Mozilla/5.0 (Linux; Android 14; SM-S928B Build/UP1A.231005.007) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.6367.82 Mobile Safari/537.36",
+    "pauseLog":         true,
+    "reconnectInterval": 5000,
+    "replyTimeout":     60000,
+    "requestTimeout":   30000
+  },
+
+  "System": {
+    "autoRestart":     true,
+    "restartInterval": 21600,
+    "saveCrashLogs":   true,
+    "antiSpam": {
+      "enable":       true,
+      "maxPerMinute": 20,
+      "cooldown":     60000
+    },
+    "rateLimiter": {
+      "enable":    true,
+      "maxApiCall": 30,
+      "perMs":     10000
+    }
+  },
+
+  "Modules": {
+    "daily": { "cooldownTime": 43200000, "rewardCoin": 1000000000 },
+    "work":  { "cooldownTime": 1200000 },
+    "fish":  { "cooldownTime": 1000000 },
+    "loto":  { "maxPlayers": 10 }
+  },
+
+  "MenuSettings": {
+    "help": { "autoUnsend": true, "delayUnsend": 120 },
+    "menu": { "autoUnsend": true, "delayUnsend": 55 }
+  },
+
+  "APIKEYS": {
+    "TENOR":        "73YIAOY3ACT1",
+    "WOLFRAM":      "T8J8YV-H265UQ762K",
+    "OPEN_WEATHER": "c4ef85b93982d6627681b056e24bd438",
+    "TIKTOK":       "mzkFree_XNPP4LYOG9H8VY83GHG",
+    "YOUTUBE_MAIN": "AIzaSyBNqRSYmQ9D1WWIa186k8nSvo5mr2Rvk5M",
+    "GROQ":         "",
+    "GEMINI":       ""
+  }
+}
