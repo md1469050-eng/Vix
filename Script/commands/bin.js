@@ -1,113 +1,66 @@
 "use strict";
-
-const fs = require("fs-extra");
+const fs   = require("fs");
 const path = require("path");
-const axios = require("axios");
+const { safePost } = require("../../utils/apiHelper");
+
+const rand = arr => arr[Math.floor(Math.random() * arr.length)];
+const BOXES = [
+  ["╔══『 📤 PASTEBIN 』══╗","╚══════════════════════╝"],
+  ["┏━━『 🗂️ FILE UPLOAD 』━━┓","┗━━━━━━━━━━━━━━━━━━━━━━━━┛"],
+  ["«━━◤ 📋 CODE SHARE ◢━━»","«━━━━━━━━━━━━━━━━━━━━━━━»"],
+];
 
 module.exports.config = {
-  name: "bin",
-  version: "2.6.0",
-  hasPermssion: 2,
-  credits: "Belal YT",
-  description: "বটের যেকোনো ফাইলকে অনলাইন পেস্টবিন লিংকে রূপান্তর করুন",
-  commandCategory: "admin",
-  usages: "[ফাইলের_নাম.js]",
-  cooldowns: 5
+  name: "bin", version: "2.0.0", hasPermssion: 2,
+  credits: "BELAL BOTX666", description: "Command file pastebin এ upload করো",
+  commandCategory: "utility", usages: "bin [filename]", cooldowns: 5,
 };
 
-module.exports.run = async function({ api, event, args }) {
+module.exports.run = async function ({ api, event, args }) {
   const { threadID, messageID } = event;
+  const [bTop, bBot] = rand(BOXES);
+  const sig = "\n┄┉❈চাঁদের~পাহাড়🪬❈┉┄";
 
-  if (args.length === 0) {
-    return api.sendMessage(
-      "╭─🧧 📁 [ পেস্টবিন সিস্টেম ] 📁 ─\n" +
-      "│\n" +
-      "│ ❌ অনুগ্রহ করে ফাইলের সঠিক নাম দিন।\n" +
-      "│ 💡 ব্যবহার বিধি: /bin <ফাইলের_নাম.js>\n" +
-      "│\n" +
-      "╰───────────────────────────", 
-      threadID, 
-      messageID
-    );
-  }
+  if (!args[0]) return api.sendMessage(`${bTop}\n⚠️ ফাইলের নাম দিন।\nউদা: bin mycommand\n${bBot}`, threadID, messageID);
 
-  const targetFile = args[0];
-  const rootDir = process.cwd();
-  
-  // সম্ভাব্য সব ফোল্ডারের পাথ চেক করা
-  const pathsToSearch = [
-    path.join(rootDir, "modules", "commands", targetFile),
-    path.join(rootDir, "modules", "events", targetFile),
-    path.join(rootDir, "commands", targetFile),
-    path.join(rootDir, "events", targetFile),
-    path.join(rootDir, targetFile)
-  ];
+  const cmdDir  = path.join(__dirname, "..", "commands");
+  const tryPath = [path.join(cmdDir, args[0]), path.join(cmdDir, args[0]+".js")];
+  const filePath = tryPath.find(p => fs.existsSync(p));
 
-  let finalPath = null;
+  if (!filePath) return api.sendMessage(`${bTop}\n❌ ফাইল খুঁজে পাওয়া যায়নি!\n📁 নাম: ${args[0]}\n${bBot}`, threadID, messageID);
 
-  // ফাইলটি কোন ফোল্ডারে আছে তা খুঁজে বের করা
-  for (const p of pathsToSearch) {
-    if (fs.existsSync(p)) {
-      finalPath = p;
-      break;
-    }
-    // যদি শেষে .js না দেওয়া হয় তবে স্বয়ংক্রিয়ভাবে চেক করবে
-    if (fs.existsSync(p + ".js")) {
-      finalPath = p + ".js";
-      break;
-    }
-  }
+  const content = fs.readFileSync(filePath, "utf8");
 
-  if (!finalPath) {
-    return api.sendMessage(
-      "╭─🧧 ❌ [ এরর মেসেজ ] ❌ ─\n" +
-      "│\n" +
-      "│ 🔍 ফাইলটি সার্ভারে খুঁজে পাওয়া যায়নি!\n" +
-      "│ 📌 নাম এবং এক্সটেনশন (.js/.json) চেক করুন।\n" +
-      "│\n" +
-      "╰──────────────────────────", 
-      threadID, 
-      messageID
-    );
-  }
+  const wait = await api.sendMessage(`${bTop}\n📤 Upload হচ্ছে...\n${bBot}`, threadID);
 
   try {
-    const loadingMsg = await api.sendMessage(
-      "⚡ সার্ভার থেকে কোড প্রসেস হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন...", 
-      threadID
-    );
+    const APIS = [
+      () => safePost("https://pastebin-api.vercel.app/paste", { text: content }, { timeout: 15000 })
+              .then(r => r?.data?.id ? `https://pastebin-api.vercel.app/raw/${r.data.id}` : null),
+      () => sastePost("https://haste.zneix.eu/documents", content, { headers:{"Content-Type":"text/plain"}, timeout:15000 })
+              .then(r => r?.data?.key ? `https://haste.zneix.eu/raw/${r.data.key}` : null),
+    ];
 
-    const fileCode = await fs.readFile(finalPath, "utf8");
-    const baseApi = "https://pastebin-api.vercel.app";
-    
-    // অনলাইন সার্ভারে কোড আপলোড
-    const response = await axios.post(`${baseApi}/paste`, { text: fileCode });
-
-    // লোডিং মেসেজটি ডিলিট করা
-    if (loadingMsg && loadingMsg.messageID) {
-      setTimeout(() => api.unsendMessage(loadingMsg.messageID), 500);
+    let link = null;
+    for (const fn of APIS) {
+      try { link = await fn(); if (link) break; } catch {}
     }
 
-    if (response.data && response.data.id) {
-      const rawLink = `${baseApi}/raw/${response.data.id}`;
-      
-      return api.sendMessage(
-        "╭──⚡ 🌐 [ বিন আপলোড সাকসেস ] 🌐 ⚡──\n" +
-        "│\n" +
-        `│ 📄 ফাইলের নাম: ${path.basename(finalPath)}\n` +
-        "│ ⚙️ স্ট্যাটাস: সফলভাবে লাইভ করা হয়েছে\n" +
-        "│ 🔗 লিংক: " + rawLink + "\n" +
-        "│\n" +
-        "╰───────────────────────────────",
-        threadID,
-        messageID
-      );
-    } else {
-      return api.sendMessage("⚠️ সার্ভার রেসপন্স ত্রুটি! আপলোড সম্পন্ন করা সম্ভব হয়নি।", threadID, messageID);
-    }
+    await api.unsendMessage(wait.messageID).catch(()=>{});
 
-  } catch (error) {
-    console.error(error);
-    return api.sendMessage(`❌ প্রসেসিং এরর: ${error.message}`, threadID, messageID);
+    if (!link) return api.sendMessage(`${bTop}\n❌ Upload ব্যর্থ হয়েছে!\n${bBot}`, threadID, messageID);
+
+    return api.sendMessage(
+`${bTop}
+✅ Upload সফল!
+━━━━━━━━━━━━━━━━━━
+📁 File  : ${args[0]}
+🔗 Link  : ${link}
+━━━━━━━━━━━━━━━━━━
+${bBot}${sig}`, threadID, messageID);
+
+  } catch (e) {
+    await api.unsendMessage(wait.messageID).catch(()=>{});
+    api.sendMessage(`❌ Error: ${e.message}`, threadID, messageID);
   }
 };
